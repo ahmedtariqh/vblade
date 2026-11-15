@@ -4,11 +4,21 @@
 
 VBlade uses a curved Macintosh-style blade with an open tube path, a rigid handle, and a forward-facing camera and white LED in a removable distal pod. One handle and one pod fit both blades. The bench display connects through a wired SPI harness.
 
-![CAD preview of the assembled size-3 prototype](assembly_preview.png)
-
 **Version 0.1** · [Print files](stl/) · [Editable CAD](cad/vblade.scad) · [Firmware](firmware/VBlade/) · [Support VBlade on Buy Me a Coffee](https://buymeacoffee.com/ahmedtariqh)
 
-## Quick start
+## Slim USB camera variant
+
+![Size 3 UVC assembly and probe clamp detail](docs/uvc-preview.jpg)
+
+[VBlade UVC](docs/uvc-build.md) uses a 5.5 mm or 7.0 mm illuminated USB borescope and a bench-mounted ESP32-S3/ST7789 monitor. The build guide includes both blade sizes, the printable probe clamp, wiring, firmware and the upstream projects that informed the design.
+
+## Original XIAO camera build
+
+The sections below cover the original V0.1 camera pod and XIAO display firmware.
+
+![CAD preview of the assembled size-3 prototype](assembly_preview.png)
+
+### Quick start
 
 1. Print the handle, both blades, the pod, the cover and the display stand.
 2. Build and flash the firmware to a XIAO ESP32-S3 Sense with OPI PSRAM enabled.

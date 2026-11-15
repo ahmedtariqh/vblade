@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: CERN-OHL-P-2.0
 // Source location: https://github.com/ahmedtariqh/vblade
 // VBlade V0.1 — simulation hardware. Dimensions in mm.
-part = "assembly"; // [assembly,blade_3,blade_4,handle,pod,pod_cover,display_stand]
+part = "assembly"; // [assembly,blade_3,blade_4,handle,pod,pod_cover,display_stand,uvc_assembly,uvc_blade,uvc_clamp]
 preview_size = 3; // [3,4]
+uvc_diameter = 5.5; // [5.5,7.0]
 $fn = 32;
 
 head_width = 29;
@@ -69,7 +70,60 @@ module pod_seat(size) {
         }
 }
 
-module blade(size) {
+uvc_length = 22;
+uvc_height = 5.4;
+uvc_width = 14.7;
+uvc_mid_y = 2.3;
+uvc_clamp_screws = [4.5,17.5];
+uvc_screw_y = 6.5;
+
+module uvc_pose(size) {
+    translate([reach(size)-43,10,size == 3 ? 16.8 : 17.8])
+        rotate([0,-7,0]) children();
+}
+
+module uvc_profile(z,h) {
+    translate([uvc_length/2,uvc_mid_y,z])
+        linear_extrude(height=h) rounded_rectangle(uvc_length,uvc_width,2);
+}
+
+module uvc_bore(d) {
+    // 0.35 mm diametral clearance for a cylindrical scope and a thin shim.
+    yz_extrusion(-2,0,0,uvc_length+4) circle(d=d+0.35);
+}
+
+module uvc_bed() {
+    uvc_profile(-uvc_height,uvc_height);
+}
+
+module uvc_bed_cut(d) {
+    // Trim the legacy web away from the clamp's envelope.
+    translate([-0.4,-5.25,0]) cube([uvc_length+0.8,15.1,30]);
+    uvc_bore(d);
+    for (x=uvc_clamp_screws)
+        translate([x,uvc_screw_y,-4.8]) cylinder(h=5.8,d=2.1);
+}
+
+module uvc_clamp(d) {
+    difference() {
+        uvc_profile(0,uvc_height);
+        uvc_bore(d);
+        for (x=uvc_clamp_screws)
+            translate([x,uvc_screw_y,-1]) cylinder(h=uvc_height+2,d=2.8);
+    }
+}
+
+module uvc_assembly(size,d) {
+    color("#24364b") handle();
+    color("#34918a") blade(size,d);
+    uvc_pose(size) {
+        color("#f3a04d") uvc_clamp(d);
+        // Visualization only. The reference probe is a cylindrical envelope.
+        color("#242d32") yz_extrusion(-0.3,0,0,uvc_length+0.4) circle(d=d);
+    }
+}
+
+module blade(size, uvc=0) {
     l = reach(size);
     delta = size == 4 ? 1 : 0;
     difference() {
@@ -91,15 +145,19 @@ module blade(size) {
                 [l*0.71,6,12,8,17.2], [l*0.86,5,10,11.7,16.2],
                 [l-6,4,8,15.8+delta,19+delta]
             ]);
-            pod_seat(size);
+            if (uvc > 0) uvc_pose(size) uvc_bed();
+            else pod_seat(size);
         }
         for (x=root_bolts)
             translate([x,0,-1]) cylinder(h=12,d=root_clearance);
-        pod_pose(size)
-            translate([-3.1,-13.3,-0.12]) cube([29.6,26.6,45]);
-        pod_pose(size)
-            for (x=pod_bolts)
-                translate([x,pod_bolt_y,-14]) cylinder(h=23,d=pod_clearance);
+        if (uvc > 0) uvc_pose(size) uvc_bed_cut(uvc);
+        else {
+            pod_pose(size)
+                translate([-3.1,-13.3,-0.12]) cube([29.6,26.6,45]);
+            pod_pose(size)
+                for (x=pod_bolts)
+                    translate([x,pod_bolt_y,-14]) cylinder(h=23,d=pod_clearance);
+        }
         for (x=[14,l*0.39])
             translate([x,15,13])
                 rotate([90,0,0]) linear_extrude(height=10)
@@ -212,3 +270,8 @@ if (part == "handle") translate([0,0,103]) handle();
 if (part == "pod") translate([0,0,pod_length]) rotate([0,90,0]) pod();
 if (part == "pod_cover") rotate([0,90,0]) pod_cover();
 if (part == "display_stand") display_stand();
+
+if (part == "uvc_assembly") uvc_assembly(preview_size,uvc_diameter);
+if (part == "uvc_blade") blade(preview_size,uvc_diameter);
+if (part == "uvc_clamp")
+    translate([0,0,uvc_height]) rotate([180,0,0]) uvc_clamp(uvc_diameter);
