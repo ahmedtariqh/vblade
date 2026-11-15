@@ -1,0 +1,5 @@
+/build/
+/.arduino/
+/firmware/*.bin
+/firmware/*.elf
+/firmware/*.map

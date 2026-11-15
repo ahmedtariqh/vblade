@@ -1,0 +1,12 @@
+VBlade license notice
+
+The original VBlade hardware design files in cad/ and exported meshes in
+stl/ are licensed under the CERN Open Hardware Licence Version 2 - Permissive
+(SPDX: CERN-OHL-P-2.0). See LICENSES/CERN-OHL-P-2.0.txt.
+Source location: https://github.com/ahmedtariqh/vblade
+
+The original VBlade firmware, documentation and render in this repository
+are licensed under the MIT License. See LICENSES/MIT.txt.
+
+Third-party dependencies retain their own licenses.
+Copyright (c) 2026 Ahmed (ahmedtariqh)
